@@ -8,8 +8,6 @@ use App\Http\Controllers\API\EchelonController;
 use App\Http\Controllers\API\GroupController;
 use App\Http\Controllers\API\EmployeeController;
 
-
-
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [RegisterController::class, 'login']);
 
@@ -19,13 +17,8 @@ Route::middleware('auth:api')->group( function () {
     Route::resource('groups', GroupController::class);
     Route::resource('echelons', EchelonController::class);
     Route::resource('employees', EmployeeController::class);
-
     Route::get('getCities',[ RegisterController::class, 'getCities' ]);
+    Route::post('employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
 
-    // Route::get('me', [RegisterController::class, 'me']);
-    // Route::post('loguut', [RegisterController::class, 'logout']);
 });
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:api');

@@ -9,6 +9,8 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use Validator;
 use App\Http\Resources\EmployeeResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+
 
 class EmployeeController extends BaseController
 {
@@ -18,7 +20,8 @@ class EmployeeController extends BaseController
     public function index()
     {
         //
-        $employees = Employee::all();
+        // $echelons = Echelon::with('groups')->get();
+        $employees = Employee::with(['echelon', 'group', 'religion'])->get();
         return $this->sendResponse(EmployeeResource::collection($employees), 'employee retrieved successfully.');
 
     }
@@ -38,76 +41,56 @@ class EmployeeController extends BaseController
     {
         $input = $request->all();
 
-        // Validate the incoming request data
         $validator = Validator::make($input, [
             'nip' => 'required|string|max:255|unique:employees,nip',
             'nama' => 'required|string|max:255',
             'tempatlahir' => 'required|string|max:255',
             'alamat' => 'required|string|max:255',
             'tanggallahir' => 'required|date',
-            'kelamin' => 'required|string|in:L,P', // Assuming L for male and P for female
+            'kelamin' => 'required|string|in:L,P', 
             'npwp' => 'nullable|string|max:255',
             'nohp' => 'required|string|max:15',
             'unitkerja' => 'required|string|max:255',
             'tempattugas' => 'required|string|max:255',
             'namajabatan' => 'required|string|max:255',
-            'foto' => 'nullable|string|max:255',
-            'echelon_id' => 'nullable|exists:echelons,id', // Assuming echelon is a related model
-            'group_id' => 'nullable|exists:groups,id', // Assuming group is a related model
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif', 
+            'echelon_id' => 'nullable|exists:echelons,id', 
+            'group_id' => 'nullable|exists:groups,id',
+            'religion_id' => 'nullable|exists:religions,id', 
         ]);
 
         if($validator->fails()){
             return response()->json(['error' => 'Validation Error.', 'messages' => $validator->errors()], 422);       
         }
 
-        // Create a new employee using the validated data
-        $employee = Employee::create($validator->validated());
+        $validatedData = $validator->validated();
 
-        // Return a JSON response with the created employee resource
-        // return response()->json(new EmployeeResource($employee), 201);
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filePath = $file->store('pictures', 'public');
+            $validatedData['foto'] = $filePath;
+        }
+
+        // Create a new employee using the validated data
+        $employee = Employee::create($validatedData);
+
         return $this->sendResponse(new EmployeeResource($employee), 'Employee created successfully.');
         
     }
-    // public function store(Request $request): JsonResponse
-    // {
-    //     $validatedData = $request->validate([
-    //         'nip' => 'required|string|max:255|unique:employees,nip',
-    //         'nama' => 'required|string|max:255',
-    //         'tempat_lahir' => 'required|string|max:255',
-    //         'alamat' => 'required|string|max:255',
-    //         'tanggal_lahir' => 'required|date',
-    //         'kelamin' => 'required|string|in:L,P',
-    //         'npwp' => 'nullable|string|max:255',
-    //         'nohp' => 'required|string|max:15',
-    //         'unit_kerja' => 'required|string|max:255',
-    //         'tempat_tugas' => 'required|string|max:255',
-    //         'nama_jabatan' => 'required|string|max:255',
-    //         'foto' => 'nullable|string|max:255',
-    //         'echelon_id' => 'nullable|exists:echelons,id', 
-    //         'group_id' => 'nullable|exists:groups,id', 
-    //     ]);
-    //     error_log("halo");
-
-
-    //     if($validator->fails()){
-    //         return $this->sendError('Validation Error.', $validator->errors());       
-    //     }
-
-
-    //     $employee = Employee::create($validatedData);
-
-    //     return $this->sendResponse(new EmployeeResource($eselon), 'Employee created successfully.');
-
-    //     // return response()->json(new EmployeeResource($employee), 201);
-
-    // }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id) : JsonResponse
     {
-        //
+
+        $employee = Employee::with(['echelon', 'group', 'religion'])->find($id);
+
+        if (is_null($employee)) {
+            return $this->sendError('employee not found.');
+        }
+       
+        return $this->sendResponse(new EmployeeResource($employee), 'echelon retrieved successfully.');
     }
 
     /**
@@ -121,16 +104,55 @@ class EmployeeController extends BaseController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Employee $employee)
     {
-        //
+        $input = $request->all();
+
+        $validator = Validator::make($input, [
+            'nip' => 'nullable|string|max:255|unique:employees,nip',
+            'nama' => 'nullable|string|max:255',
+            'tempatlahir' => 'nullable|string|max:255',
+            'alamat' => 'nullable|string|max:255',
+            'tanggallahir' => 'nullable|date',
+            'kelamin' => 'nullable|string|in:L,P', 
+            'npwp' => 'nullable|string|max:255',
+            'nohp' => 'nullable|string|max:15',
+            'unitkerja' => 'nullable|string|max:255',
+            'tempattugas' => 'nullable|string|max:255',
+            'namajabatan' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif', 
+            'echelon_id' => 'nullable|exists:echelons,id', 
+            'group_id' => 'nullable|exists:groups,id', 
+            'religion_id' => 'nullable|exists:religions,id', 
+        ]);
+
+
+        if($validator->fails()){
+            return response()->json(['error' => 'Validation Error.', 'messages' => $validator->errors()], 422);       
+        }
+        $validatedData = $validator->validated();
+
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filePath = $file->store('pictures', 'public');
+            $validatedData['foto'] = $filePath;
+        }
+       
+
+        $employee->update($validatedData);
+
+        return $this->sendResponse(new EmployeeResource($employee), 'Employee updated successfully.');
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Employee $employee): JsonResponse
     {
         //
+        $employee->delete();
+    
+        return $this->sendResponse([], 'Employee deleted successfully.');
     }
 }

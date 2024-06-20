@@ -1,16 +1,19 @@
 <template>
      <FilterTable />
 
-    
 </template>
     
 <script setup lang="ts">
 
+import FilterTable from '~/components/FilterTable.vue'
 
     definePageMeta({
-        middleware: 'auth' // this should match the name of the file inside the middleware directory 
+        middleware: 'auth' 
     })
-    import FilterTable from '~/components/FilterTable.vue'
+
+    useHead({
+        title: 'Home'
+    });
 
 
 </script>

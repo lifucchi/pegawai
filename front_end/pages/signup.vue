@@ -29,7 +29,24 @@
                   </div>
                   <div class="flex items-center justify-between">
                   </div>
-                  <button @click.prevent="signup" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-primary-800">Sign up</button>                 
+                  <button v-if="agreement"
+                    @click.prevent="signup"
+                    :disabled="!agreement"
+                    class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-primary-800">
+                    Sign up
+                </button>
+                <button v-else
+                        class="w-full text-white bg-gray-400 cursor-not-allowed hover:bg-gray-400 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-400 dark:hover:bg-gray-400 dark:focus:ring-gray-300">
+                    Sign up
+                </button>                  <div class="flex items-start">
+                          <div class="flex items-center h-5">
+                            <input @click="agree" id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required>
+                          </div>
+                          <div class="ml-3 text-sm">
+                            <label for="remember" class="text-gray-500 dark:text-gray-300">Dengan mendaftar, Anda membuat akun  dan menyetujui Syarat Penggunaan serta Kebijakan Privasi</label>
+                          </div>
+                      </div>
+
                   <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                       You have an account ?  <NuxtLink to="/login"class="font-medium text-primary-600 hover:underline dark:text-primary-500"> Sign In</NuxtLink>
                   </p>
@@ -42,6 +59,9 @@
 </template>
 
 <script setup>
+useHead({
+  title: 'SignUp'
+});
   
     const user = ref({
         name: '',
@@ -50,12 +70,13 @@
         password_confirm: '',
     });
 
+    const agreement = ref(false);
+
     definePageMeta({
-        middleware: 'authsignup' // this should match the name of the file inside the middleware directory 
+        middleware: 'authsignup' 
     })
     
     async function signup(){
-        console.log("masuk tombol")
         const result = await $fetch(`http://127.0.0.1:8000/api/register`, {
                     method: "POST",
                     body: {
@@ -65,16 +86,16 @@
                         c_password: user.value.password_confirm
                     }
                 });
-                console.log("masuk tombol2")
-
                 if (result.success == true){
-                    console.log(result)
                     const router = useRouter();
                     router.push('/');
                 }
 
-
     }
 
+    function agree(){
+        agreement.value = !agreement.value;
+
+    }
 
 </script>

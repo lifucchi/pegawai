@@ -19,19 +19,7 @@ class GroupController extends BaseController
      */
     public function index(Request $request)
     {
-        // $echelon = Group::find(1);
-        // $groups = Group::with('echelons')->get();
-        // foreach ($groups as $group) {
-        //     echo "Group: " . $group->golongan . ", Echelon: " . $group->echelon->eselon . "\n";
-        //     error_log($group->golongan);
 
-        // }
-        // error_log($groups);
-
-        // dd($echelon);
-        
-        // return $this->sendResponse(Group::collection($echelon), 'group retrieved successfully.');
-        // return PostResource::collection(Group::with('comments')->get());
 
         $groups = Group::with('echelons')->get();
         return response()->json(GroupResource::collection($groups));
@@ -57,8 +45,6 @@ class GroupController extends BaseController
     public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-        // error_log($input);
-        // error_log(print_r($input, true));
 
         $validator = Validator::make($input, [
             'golongan' => 'required'
@@ -67,7 +53,6 @@ class GroupController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());       
         }
         $group = Group::create($input);
-        // error_log(print_r($group, true));
 
 
         return $this->sendResponse(new GroupResource($group), 'Group created successfully.');
@@ -81,7 +66,6 @@ class GroupController extends BaseController
      */
     public function show($id) : JsonResponse
     {
-        // error_log($eselon);
 
         $group = Group::find($id);
 

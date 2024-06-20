@@ -49,7 +49,6 @@ class EchelonController extends BaseController
     public function store(Request $request): JsonResponse
     {
         $input = $request->all();
-        error_log(print_r($input, true));
 
         $validator = Validator::make($input, [
             'eselon' => 'required'
@@ -71,10 +70,8 @@ class EchelonController extends BaseController
      */
     public function show($id) : JsonResponse
     {
-        // error_log($eselon);
 
         $eselon = Echelon::find($id);
-        error_log($eselon);
 
         if (is_null($eselon)) {
             return $this->sendError('eselon not found.');
@@ -105,8 +102,6 @@ class EchelonController extends BaseController
     {
         //
         $input = $request->all();
-        // error_log($input);
-        error_log($echelon);
 
         $echelon->eselon = $input['eselon'];
         $echelon->save();
@@ -124,8 +119,6 @@ class EchelonController extends BaseController
     public function destroy(Echelon $echelon): JsonResponse
     {
         //
-        Log::info($echelon);
-        error_log($echelon);
 
         $echelon->delete();
        

@@ -17,6 +17,7 @@ class ReligionResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'employeee' => EmployeeResource::collection($this->whenLoaded('employees')),
             'created_at' => $this->created_at->format('d/m/Y'),
             'updated_at' => $this->updated_at->format('d/m/Y'),
         ];

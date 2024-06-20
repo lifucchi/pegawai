@@ -14,6 +14,7 @@ class EmployeeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // error_log($this)
         return [
             'id' => $this->id,
             'nip' => $this->nip,
@@ -28,8 +29,12 @@ class EmployeeResource extends JsonResource
             'tempattugas' => $this->tempattugas,
             'namajabatan' => $this->namajabatan,
             'foto' => $this->foto,
-            'echelon_id' => new EchelonResource($this->eselon), // Assuming you have a relationship defined
-            'group_id' => new GroupResource($this->golongan), // Assuming you have a relationship defined
+            'echelon' => new EchelonResource($this->whenLoaded('echelon')),
+            'group' => new GroupResource($this->whenLoaded('group')),
+            'echelon_id' => $this->echelon_id, // Assuming you have a relationship defined
+            'group_id' => $this->group_id, // Assuming you have a relationship defined
+            'religion_id' => $this->religion_id, // Assuming you have a relationship defined
+            'religion' => new ReligionResource($this->whenLoaded('religion')), 
             'created_at' => $this->created_at->format('Y-m-d H:i:s'), // Adjust date format as needed
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'), // Adjust date format as needed
         ];

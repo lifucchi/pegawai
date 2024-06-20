@@ -25,12 +25,9 @@ return new class extends Migration
             $table->string('tempattugas')->nullable();
             $table->string('namajabatan')->nullable();
             $table->string('foto')->nullable();
-            // $table->foreignId('echelon_id')->constrained('echelons');
-            // $table->foreignId('group_id')->constrained('groups');
-            $table->unsignedBigInteger('echelon_id')->nullable();
-            $table->unsignedBigInteger('group_id')->nullable();
-            $table->foreign('echelon_id')->references('id')->on('echelons')->onDelete('set null');
-            $table->foreign('group_id')->references('id')->on('groups')->onDelete('set null');
+            $table->foreignId('echelon_id')->constrained('echelons')->nullable();
+            $table->foreignId('group_id')->constrained('groups')->nullable();
+            $table->foreignId('religion_id')->constrained('religions')->nullable();
             $table->timestamps();
         });
     }

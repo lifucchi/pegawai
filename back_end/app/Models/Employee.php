@@ -26,23 +26,26 @@ class Employee extends Model
         'foto',
         'echelon_id',
         'group_id',
+        'religion_id'
     ];
 
     protected $casts = [
         'tanggallahir' => 'date',
     ];
 
-    public function echelon()
+    public function echelon(): BelongsTo
     {
-        return $this->belongsTo(Echelon::class);
+        return $this->belongsTo(Echelon::class, 'echelon_id');
     }
 
-    /**
-     * Get the group associated with the employee.
-     */
-    public function group()
+    public function group(): BelongsTo
     {
-        return $this->belongsTo(Group::class);
+        return $this->belongsTo(Group::class, 'group_id');
+    }
+
+    public function religion(): BelongsTo
+    {
+        return $this->belongsTo(Religion::class, 'religion_id');
     }
 
 }

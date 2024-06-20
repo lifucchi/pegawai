@@ -18,7 +18,7 @@ class ReligionController extends BaseController
      */
     public function index(): JsonResponse
     {
-        $religions = Religion::all();
+        $religions = Religion::with(['employees'])->get();
         
         return $this->sendResponse(ReligionResource::collection($religions), 'religions retrieved successfully.');
     }
@@ -79,7 +79,6 @@ class ReligionController extends BaseController
         ]);
        
         if($validator->fails()){
-            // return $this->sendError('Validation Error.',  $request->all());       
             return $this->sendError('Validation Error.', $validator->errors());       
         }
        
