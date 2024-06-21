@@ -119,7 +119,6 @@
 
     const religions = ref([]); 
     const echelons = ref([]); 
-    const groups = ref([]); 
 
     const handleFileChange = (event) => {
       form.value.foto = event.target.files[0];

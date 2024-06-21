@@ -17,13 +17,20 @@ class EmployeeController extends BaseController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        // $echelons = Echelon::with('groups')->get();
+        $perPage = $request->get('per_page'); 
+        
         $employees = Employee::with(['echelon', 'group', 'religion'])->get();
-        return $this->sendResponse(EmployeeResource::collection($employees), 'employee retrieved successfully.');
-
+        return response()->json([
+            'data' => EmployeeResource::collection($employees),
+            // 'meta' => [
+            //     'current_page' => $employees->currentPage(),
+            //     'last_page' => $employees->lastPage(),
+            //     'per_page' => $employees->perPage(),
+            //     'total' => $employees->total()
+            // ]
+        ], 200);
     }
 
     /**
